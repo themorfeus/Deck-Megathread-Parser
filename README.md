@@ -3,7 +3,13 @@
 
 A small utility i've created for the /r/SteamDeck subreddit for easier parsing and tracking of people's reserve times
 
-To use, you must create and set-up a reddit app [here](https://www.reddit.com/prefs/apps) and insert your secret and app id into DeckFetcher.cs
+To use, you must create and set-up a reddit app [here](https://www.reddit.com/prefs/apps) and create a file called **config.ini** next to the executable, with the following contents:
+
+```
+AppID=YOUR_APP_ID
+AppSecret=YOUR_APP_SECRET
+```
+
 When the app asks you for the post ID you must paste the ID that you can find in the post link - right after the `comments` section. 
 
 Presented below in bold:

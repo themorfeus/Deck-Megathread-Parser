@@ -8,22 +8,30 @@ namespace DeckFetcher;
 
 public class DeckFetcher
 {
-    private const string AppID = "YOUR_APP_ID";
-    private const string AppSecret = "YOUR_APP_SECRET";
-    private static string AppAuthKey => Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{AppID}:{AppSecret}"));
-    
+    private string AppID;
+    private string AppSecret;
+    private string AppAuthKey => Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{AppID}:{AppSecret}"));
+
+    private Ini ConfigFile;
     private readonly HttpClient Client;
     private string OAuthToken;
 
     public DeckFetcher()
     {
         Client = new HttpClient();
+
+        ConfigFile = new Ini("config.ini");
+
+        AppID = ConfigFile.GetValue("AppID");
+        AppSecret = ConfigFile.GetValue("AppSecret");
+        
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", AppAuthKey);
         Client.DefaultRequestHeaders.Add("User-Agent", "steamdeck-fetcher/0.1 by themorfeus");
     }
 
     public async Task Run()
     {
+        int retryCounter = 10;
         OAuthToken = null;
         do
         {
@@ -32,9 +40,17 @@ public class DeckFetcher
             if (OAuthToken == null)
             {
                 Console.WriteLine("Invalid Login\n");
+                retryCounter--;
             }
-        } while (OAuthToken == null);
-    
+        } while (OAuthToken == null && retryCounter > 0);
+
+        if (OAuthToken == null)
+        {
+            Console.WriteLine("Login Failed");
+            Shutdown();
+            return;
+        }
+        
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", OAuthToken);
         
         string postID;
