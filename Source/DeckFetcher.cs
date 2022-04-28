@@ -181,7 +181,7 @@ public class DeckFetcher
         return commentBodies;
     }
 
-    private void ExtractComments(JToken? data, List<Comment> commentBodies, List<string> moreList)
+    private void ExtractComments(JToken data, List<Comment> commentBodies, List<string> moreList)
     {
         foreach (var child in data)
         {
@@ -221,7 +221,7 @@ public class DeckFetcher
     }
     
 
-    private async Task<JToken?> GetMoreChildren(string postID, string children)
+    private async Task<JToken> GetMoreChildren(string postID, string children)
     {
         var url = $"https://oauth.reddit.com/api/morechildren?link_id=t3_{postID}&children={children}&api_type=json";
         var response = await Client.GetStringAsync(url);
