@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -175,8 +176,11 @@ public class DeckFetcher
         ExtractComments(data, commentBodies, moreList);
 
         var additional = await GetMoreChildren(postID, string.Join(",", moreList));
-        
-        ExtractComments(additional, commentBodies, moreList);
+
+        if (additional != null)
+        {
+            ExtractComments(additional, commentBodies, moreList);
+        }
         
         return commentBodies;
     }
@@ -226,6 +230,8 @@ public class DeckFetcher
         var url = $"https://oauth.reddit.com/api/morechildren?link_id=t3_{postID}&children={children}&api_type=json";
         var response = await Client.GetStringAsync(url);
         var thread = JObject.Parse(response);
+        if (!thread.ContainsKey("json")) return null;
+        if (!(thread["json"] as JObject).ContainsKey("data")) return null;
         return thread["json"]["data"]["things"];
     }
     
